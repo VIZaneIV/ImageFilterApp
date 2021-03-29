@@ -34,7 +34,7 @@
             </ScrollViewer>
         </GroupBox>
         <Button x:Name="load_Image_Button" Content="Load Image" HorizontalAlignment="Left" Margin="11,266,0,0" VerticalAlignment="Top" Width="88" Click="Load_Image"/>
-        <Button x:Name="undo_button" Content="Undo" HorizontalAlignment="Left" Margin="500,291,0,0" VerticalAlignment="Top" Width="88" Click="Undo_Click"/>
+        <Button x:Name="undo_button" Content="Undo" HorizontalAlignment="Left" Margin="669,291,0,0" VerticalAlignment="Top" Width="88" Click="Undo_Click"/>
         <Button x:Name="save_Image_Button" Content="Save Image" HorizontalAlignment="Left" Margin="11,291,0,0" VerticalAlignment="Top" Width="88" Click="Save_Image"/>
         <Button x:Name="inversion_Button" Content="Inversion" HorizontalAlignment="Left" Margin="136,266,0,0" VerticalAlignment="Top" Width="130" Click="Inversion_Click"/>
         <Button x:Name="brightnes_Button" Content="Brightnes correction" HorizontalAlignment="Left" Margin="136,291,0,0" VerticalAlignment="Top" Width="130" Click="Brightnes_Click"/>
@@ -45,7 +45,9 @@
         <Button x:Name="sharpen_Button" Content="Sharpen" HorizontalAlignment="Left" Margin="318,316,0,0" VerticalAlignment="Top" Width="130" Click="Sharpen_Click"/>
         <Button x:Name="edge_Button" Content="Edge detection" HorizontalAlignment="Left" Margin="318,341,0,0" VerticalAlignment="Top" Width="130" Click="Edge_Click"/>
         <Button x:Name="emboss_Button" Content="Emboss" HorizontalAlignment="Left" Margin="318,366,0,0" VerticalAlignment="Top" Width="130" Click="Emboss_Click"/>
-        <Button x:Name="apply_button" Content="Apply" HorizontalAlignment="Left" Margin="500,266,0,0" VerticalAlignment="Top" Width="88" Click="Apply_Function"/>
-        <Button x:Name="undoAll_button" Content="Undo all" HorizontalAlignment="Left" Margin="500,316,0,0" VerticalAlignment="Top" Width="88" Click="UndoAll_Click"/>
+        <Button x:Name="apply_button" Content="Apply" HorizontalAlignment="Left" Margin="669,266,0,0" VerticalAlignment="Top" Width="88" Click="Apply_Function"/>
+        <Button x:Name="undoAll_button" Content="Undo all" HorizontalAlignment="Left" Margin="669,316,0,0" VerticalAlignment="Top" Width="88" Click="UndoAll_Click"/>
+        <Button x:Name="grey_Button" Content="Gray scale convertion" HorizontalAlignment="Left" Margin="483,266,0,0" VerticalAlignment="Top" Width="130" Click="Grey_Click"/>
+        <Button x:Name="Average_dithering_button" Content="Average dithering" HorizontalAlignment="Left" Margin="483,291,0,0" VerticalAlignment="Top" Width="130" Click="Dithering_Click"/>
     </Grid>
 </Window>

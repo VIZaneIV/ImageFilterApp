@@ -183,6 +183,8 @@ namespace ImageFilterApp
             return Convert.ToInt32(Math.Pow(color / 255, gamma) * 255);
         }
 
+
+
         // ===============================================================================
 
         // Convolution filters
@@ -435,6 +437,59 @@ namespace ImageFilterApp
 
         // ===============================================================================
 
+        // Lab 2 functions
+
+        private void GreyScaleConvertion()
+        {
+            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    int sum = 0;
+                    Color pixelColor = pic.GetPixel(x, y);
+                    sum = Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3);
+                    pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, sum, sum, sum));
+                }
+            }
+            output_Image.Source = ToBitmapImage(pic);
+        }
+
+        private void Average_Dithering()
+        {
+            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+            int average = 0;
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    Color pixelColor = pic.GetPixel(x, y);
+                    average += Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3);
+                }
+            }
+
+            average = Convert.ToInt32(average / (pic.Height * pic.Width));
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+
+                    Color pixelColor = pic.GetPixel(x, y);
+                    if (Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3) > average)
+                        pic.SetPixel(x, y, Color.FromArgb(pixelColor.A,255,255,255));
+                    else
+                        pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, 0, 0, 0));
+                }
+            }
+
+            output_Image.Source = ToBitmapImage(pic);
+        }
+
+        // ===============================================================================
+
         // Button events 
 
         private void Apply_Function(object sender, RoutedEventArgs e)
@@ -496,6 +551,16 @@ namespace ImageFilterApp
         private void Emboss_Click(object sender, RoutedEventArgs e)
         {
             Emboss3x3();
+        }
+
+        private void Grey_Click(object sender, RoutedEventArgs e)
+        {
+            GreyScaleConvertion();
+        }
+
+        private void Dithering_Click(object sender, RoutedEventArgs e)
+        {
+            Average_Dithering();
         }
 
         // =============================================================
