@@ -8,10 +8,30 @@
         Title="MainWindow" Height="450" MinHeight="450" MaxHeight="450" Width="800" MinWidth="800" MaxWidth="800">
     <Grid>
         <GroupBox Header="Input Image" HorizontalAlignment="Left" Height="257" Margin="11,4,0,0" VerticalAlignment="Top" Width="385">
-            <Image x:Name="input_Image" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="359"/>
+            <ScrollViewer x:Name="inputScroll" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="355" HorizontalScrollBarVisibility="Auto" >
+                <Canvas Width="{Binding ActualWidth, ElementName=input_Image}" Height="{Binding ActualHeight, ElementName=input_Image}" >
+                    <Canvas.Background>
+                        <VisualBrush  >
+                            <VisualBrush.Visual>
+                                <Image x:Name="input_Image"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Canvas.Background>
+                </Canvas>
+            </ScrollViewer>
         </GroupBox>
         <GroupBox Header="Filtered Image" HorizontalAlignment="Left" Height="257" Margin="398,4,0,0" VerticalAlignment="Top" Width="385">
-            <Image x:Name="output_Image" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="359"/>
+            <ScrollViewer x:Name="outputScroll" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="355" HorizontalScrollBarVisibility="Auto" >
+                <Canvas Width="{Binding ActualWidth, ElementName=output_Image}" Height="{Binding ActualHeight, ElementName=output_Image}" >
+                    <Canvas.Background>
+                        <VisualBrush  >
+                            <VisualBrush.Visual>
+                                <Image x:Name="output_Image"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Canvas.Background>
+                </Canvas>
+            </ScrollViewer>
         </GroupBox>
         <Button x:Name="load_Image_Button" Content="Load Image" HorizontalAlignment="Left" Margin="11,266,0,0" VerticalAlignment="Top" Width="88" Click="Load_Image"/>
         <Button x:Name="undo_button" Content="Undo" HorizontalAlignment="Left" Margin="500,291,0,0" VerticalAlignment="Top" Width="88" Click="Undo_Click"/>
