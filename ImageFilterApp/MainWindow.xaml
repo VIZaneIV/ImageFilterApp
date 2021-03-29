@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" MinHeight="450" MaxHeight="450" Width="800" MinWidth="800" MaxWidth="800">
     <Grid>
         <GroupBox Header="Input Image" HorizontalAlignment="Left" Height="257" Margin="11,4,0,0" VerticalAlignment="Top" Width="385">
-            <Image x:Name="input_Image" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="359" Stretch="None"/>
+            <Image x:Name="input_Image" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="359"/>
         </GroupBox>
         <GroupBox Header="Filtered Image" HorizontalAlignment="Left" Height="257" Margin="398,4,0,0" VerticalAlignment="Top" Width="385">
             <Image x:Name="output_Image" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="359"/>
