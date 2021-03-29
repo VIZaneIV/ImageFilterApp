@@ -1,0 +1,31 @@
+﻿<Window x:Class="ImageFilterApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageFilterApp"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" MinHeight="450" MaxHeight="450" Width="800" MinWidth="800" MaxWidth="800">
+    <Grid>
+        <GroupBox Header="Input Image" HorizontalAlignment="Left" Height="257" Margin="11,4,0,0" VerticalAlignment="Top" Width="385">
+            <Image x:Name="input_Image" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="359" Stretch="None"/>
+        </GroupBox>
+        <GroupBox Header="Filtered Image" HorizontalAlignment="Left" Height="257" Margin="398,4,0,0" VerticalAlignment="Top" Width="385">
+            <Image x:Name="output_Image" HorizontalAlignment="Left" Height="220" Margin="10,10,0,0" VerticalAlignment="Top" Width="359"/>
+        </GroupBox>
+        <Button x:Name="load_Image_Button" Content="Load Image" HorizontalAlignment="Left" Margin="11,266,0,0" VerticalAlignment="Top" Width="88" Click="Load_Image"/>
+        <Button x:Name="undo_button" Content="Undo" HorizontalAlignment="Left" Margin="500,291,0,0" VerticalAlignment="Top" Width="88" Click="Undo_Click"/>
+        <Button x:Name="save_Image_Button" Content="Save Image" HorizontalAlignment="Left" Margin="11,291,0,0" VerticalAlignment="Top" Width="88" Click="Save_Image"/>
+        <Button x:Name="inversion_Button" Content="Inversion" HorizontalAlignment="Left" Margin="136,266,0,0" VerticalAlignment="Top" Width="130" Click="Inversion_Click"/>
+        <Button x:Name="brightnes_Button" Content="Brightnes correction" HorizontalAlignment="Left" Margin="136,291,0,0" VerticalAlignment="Top" Width="130" Click="Brightnes_Click"/>
+        <Button x:Name="contrast_Button" Content="Contrast enhancement" HorizontalAlignment="Left" Margin="136,315,0,0" VerticalAlignment="Top" Width="130" Click="Contrast_Click"/>
+        <Button x:Name="gamma_Button" Content="Gamma correction" HorizontalAlignment="Left" Margin="136,340,0,0" VerticalAlignment="Top" Width="130" Click="Gamma_Click"/>
+        <Button x:Name="blur_Button" Content="Blur" HorizontalAlignment="Left" Margin="318,266,0,0" VerticalAlignment="Top" Width="130" Click="Blur_Click"/>
+        <Button x:Name="gaussian_Button" Content="Gaussian blur" HorizontalAlignment="Left" Margin="318,291,0,0" VerticalAlignment="Top" Width="130" Click="GaussianBlur_Click"/>
+        <Button x:Name="sharpen_Button" Content="Sharpen" HorizontalAlignment="Left" Margin="318,316,0,0" VerticalAlignment="Top" Width="130" Click="Sharpen_Click"/>
+        <Button x:Name="edge_Button" Content="Edge detection" HorizontalAlignment="Left" Margin="318,341,0,0" VerticalAlignment="Top" Width="130" Click="Edge_Click"/>
+        <Button x:Name="emboss_Button" Content="Emboss" HorizontalAlignment="Left" Margin="318,366,0,0" VerticalAlignment="Top" Width="130" Click="Emboss_Click"/>
+        <Button x:Name="apply_button" Content="Apply" HorizontalAlignment="Left" Margin="500,266,0,0" VerticalAlignment="Top" Width="88" Click="Apply_Function"/>
+        <Button x:Name="undoAll_button" Content="Undo all" HorizontalAlignment="Left" Margin="500,316,0,0" VerticalAlignment="Top" Width="88" Click="UndoAll_Click"/>
+    </Grid>
+</Window>
