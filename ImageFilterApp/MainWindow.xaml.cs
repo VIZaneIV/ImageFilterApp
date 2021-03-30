@@ -456,10 +456,21 @@ namespace ImageFilterApp
             output_Image.Source = ToBitmapImage(pic);
         }
 
+        // Fixed average dithering
         private void Average_Dithering()
         {
             Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
             int average = 0;
+
+            int number = Convert.ToInt32(slValue_Dither.Value);
+
+            int[] intervals = new int[number];
+            int step = (255 / number);
+
+            for (int i = 0; i < number - 1; i++)
+                intervals[i] = step * (i + 1);
+
+            intervals[number - 1]=255;
 
             for (int y = 0; (y <= (pic.Height - 1)); y++)
             {
@@ -476,17 +487,60 @@ namespace ImageFilterApp
             {
                 for (int x = 0; (x <= (pic.Width - 1)); x++)
                 {
-
                     Color pixelColor = pic.GetPixel(x, y);
-                    if (Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3) > average)
-                        pic.SetPixel(x, y, Color.FromArgb(pixelColor.A,255,255,255));
-                    else
-                        pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, 0, 0, 0));
+
+                    for (int i = 0; i < number; i++)
+                    {
+                        if (Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3) < intervals[i])
+                        {
+                            pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, intervals[i], intervals[i], intervals[i]));
+                            break;
+                        }
+                    }
                 }
             }
 
             output_Image.Source = ToBitmapImage(pic);
         }
+
+        // Wasn't sure how to divide the color cube into smaller cuboids so I divided it into plates of sizes 255 x 255 x H where H is different heights 
+        private void MedianCut_Copout()
+        {
+            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+            int interval = Convert.ToInt32(255/slValue.Value); //62
+
+            int average = 0;
+
+            int number = Convert.ToInt32(slValue.Value);
+
+            int[] intervals = new int[number];
+            int step = (255 / number);
+
+            for (int i = 0; i < number - 1; i++)
+                intervals[i] = step * (i + 1);
+
+            intervals[number - 1] = 255;
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    Color pixelColor = pic.GetPixel(x, y);
+
+                    for (int i = 0; i < number; i++)
+                    {
+                        if (Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3) < intervals[i])
+                        {
+                            pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, intervals[i], 65, 65));
+                            break;
+                        }
+                    }
+                }
+            }
+            output_Image.Source = ToBitmapImage(pic);
+
+        }
+
 
         // ===============================================================================
 
@@ -562,6 +616,18 @@ namespace ImageFilterApp
         {
             Average_Dithering();
         }
+
+        private void MedCut_Click(object sender, RoutedEventArgs e)
+        {
+            MedianCut_Copout();
+        }
+
+        private void Lab2_Click(object sender, RoutedEventArgs e)
+        {
+            Lab2();
+        }
+
+
 
         // =============================================================
 
