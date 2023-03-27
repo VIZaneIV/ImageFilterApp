@@ -8,6 +8,8 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Windows.Input;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ImageFilterApp
 {
@@ -96,7 +98,72 @@ namespace ImageFilterApp
         }
 
         //===============================================================================
+        // Get pixels into a Color array
+        Color[,] TranslatePicture(Bitmap pic)
+        {
+            Color[,] ColorPic = new Color[pic.Width, pic.Height];
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    ColorPic[x, y] = pic.GetPixel(x, y);
+                }
+            }
+            return ColorPic;
+        }
 
+        // Compare 3 numbers and find the greatest. 1 - first number 2 - second number 3 - third number (R,G,B)
+        int CompareNumbers(double first, double second, double third)
+        {
+            if (first >= second && first >= third)
+                return 1;
+            else if (second >= first && second >= third)
+                return 2;
+            else
+                return 3;
+        }
+        // Calculate Min - Max differences in a side of a box
+        Dictionary<double, double> GetDiff(Dictionary<double, List<int>> side)
+        {
+            Dictionary<double, double> diff = new Dictionary<double, double>();
+
+            foreach (var keyValuePair in side)
+            {
+                double Max = 0;
+                double Min = 255;
+
+                foreach (var listItem in keyValuePair.Value)
+                {
+                    if (Max < listItem)
+                        Max = listItem;
+                    if (Min > listItem)
+                        Min = listItem;
+                }
+                diff.Add(keyValuePair.Key, Max - Min);
+            }
+                return diff;
+        }
+
+        Dictionary<double, double> GetMedians(Dictionary<double, List<int>> side)
+        {
+            Dictionary<double, double> medians = new Dictionary<double, double>();
+            double median;
+            foreach (var keyValuePair in side)
+            {
+                keyValuePair.Value.Sort();
+                if (keyValuePair.Value.Count() % 2 == 0)
+                    median = (keyValuePair.Value[(keyValuePair.Value.Count() / 2) - 1] + keyValuePair.Value[keyValuePair.Value.Count() / 2]) / 2;
+                else
+                    median = keyValuePair.Value[(keyValuePair.Value.Count() - 1) / 2];
+                medians.Add(keyValuePair.Key, median);
+            }
+
+            return medians;
+        }
+
+
+
+        //===============================================================================
 
         // Function filters
         private void Inversionfilter()
@@ -503,40 +570,159 @@ namespace ImageFilterApp
             output_Image.Source = ToBitmapImage(pic);
         }
 
-        // Wasn't sure how to divide the color cube into smaller cuboids so I divided it into plates of sizes 255 x 255 x H where H is different heights 
-        private void MedianCut_Copout()
+        
+        private void MedianCut()
         {
             Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
-            int interval = Convert.ToInt32(255/slValue.Value); //62
+            Color[,] ColorPic = TranslatePicture(pic);
 
-            int average = 0;
+            int numberOfCuts = Convert.ToInt32(slValue.Value);
 
-            int number = Convert.ToInt32(slValue.Value);
+            //Dictionary (Upper value bound of the box, List of values in the box)
+            Dictionary<double, List<int>> RSide = new Dictionary<double, List<int>>();
+            Dictionary<double, List<int>> GSide = new Dictionary<double, List<int>>();
+            Dictionary<double, List<int>> BSide = new Dictionary<double, List<int>>();
 
-            int[] intervals = new int[number];
-            int step = (255 / number);
-
-            for (int i = 0; i < number - 1; i++)
-                intervals[i] = step * (i + 1);
-
-            intervals[number - 1] = 255;
-
+            List<int> Rtmp = new List<int>();
+            List<int> Gtmp = new List<int>();
+            List<int> Btmp = new List<int>();
+            // Create one big box with all Colors
             for (int y = 0; (y <= (pic.Height - 1)); y++)
             {
                 for (int x = 0; (x <= (pic.Width - 1)); x++)
                 {
-                    Color pixelColor = pic.GetPixel(x, y);
+                    Rtmp.Add(ColorPic[x, y].R);
+                    Gtmp.Add(ColorPic[x, y].G);
+                    Btmp.Add(ColorPic[x, y].B);
+                }
+            }
+            RSide.Add(256, Rtmp);
+            GSide.Add(256, Gtmp);
+            BSide.Add(256, Btmp);
 
-                    for (int i = 0; i < number; i++)
-                    {
-                        if (Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3) < intervals[i])
+            //Rtmp.Clear();
+            //Gtmp.Clear();
+            //Btmp.Clear();
+
+
+
+            for (int i = 0; i < numberOfCuts; i++)
+            { 
+                // Determine the range of colors in each box
+                // Dictionary (Upper value bound of the box, Min - Max difference in the box)
+                Dictionary<double, double> Rdiff = GetDiff(RSide);
+                Dictionary<double, double> Gdiff = GetDiff(GSide);
+                Dictionary<double, double> Bdiff = GetDiff(BSide);
+
+                // Longest side of the box, and split the box along that axis into two smaller boxes
+                double median;
+                double MaxValueKey;
+                // Lists of values that will split the box with the biggest difference
+                List<int> box1 = new List<int>();
+                List<int> box2 = new List<int>();
+                switch (CompareNumbers(Rdiff.Values.Max(), Gdiff.Values.Max(), Bdiff.Values.Max()))
+                {
+                    case 1: // Case 1: R channel has the biggest value spread
+                        MaxValueKey = Rdiff.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+                        RSide[MaxValueKey].Sort();
+                        if (RSide[MaxValueKey].Count() % 2 == 0)
+                            median = (RSide[MaxValueKey][(RSide[MaxValueKey].Count() / 2) - 1] + RSide[MaxValueKey][RSide[MaxValueKey].Count() / 2]) / 2;
+                        else
+                            median = RSide[MaxValueKey][(RSide[MaxValueKey].Count() - 1) / 2];
+
+                        foreach (var value in RSide[MaxValueKey])
                         {
-                            pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, intervals[i], 65, 65));
+                            if (value < median)
+                                box1.Add(value);
+                            else
+                                box2.Add(value);
+                        }
+                        RSide.Remove(MaxValueKey);
+                        RSide.Add(median, box1);
+                        RSide.Add(MaxValueKey, box2);
+
+                        break;
+                    case 2:// Case 2: G channel has the biggest value spread
+                        MaxValueKey = Gdiff.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+                        GSide[MaxValueKey].Sort();
+                        if (GSide[MaxValueKey].Count() % 2 == 0)
+                            median = (GSide[MaxValueKey][(GSide[MaxValueKey].Count() / 2) - 1] + GSide[MaxValueKey][GSide[MaxValueKey].Count() / 2]) / 2;
+                        else
+                            median = GSide[MaxValueKey][(GSide[MaxValueKey].Count() - 1) / 2];
+
+                        foreach (var value in GSide[MaxValueKey])
+                        {
+                            if (value < median)
+                                box1.Add(value);
+                            else
+                                box2.Add(value);
+                        }
+                        GSide.Remove(MaxValueKey);
+                        GSide.Add(median, box1);
+                        GSide.Add(MaxValueKey, box2);
+                        break;
+                    case 3: // Case 3: B channel has the biggest value spread
+                        MaxValueKey = Bdiff.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+                        BSide[MaxValueKey].Sort();
+                        if (BSide[MaxValueKey].Count() % 2 == 0)
+                            median = (BSide[MaxValueKey][(BSide[MaxValueKey].Count() / 2) - 1] + BSide[MaxValueKey][BSide[MaxValueKey].Count() / 2]) / 2;
+                        else
+                            median = BSide[MaxValueKey][(BSide[MaxValueKey].Count() - 1) / 2];
+
+                        foreach (var value in BSide[MaxValueKey])
+                        {
+                            if (value < median)
+                                box1.Add(value);
+                            else
+                                box2.Add(value);
+                        }
+                        BSide.Remove(MaxValueKey);
+                        BSide.Add(median, box1);
+                        BSide.Add(MaxValueKey, box2);
+                        break;
+                }
+
+            }
+            // After the box of all colors has been split find median of each one
+            // Dictionary (Upper value bound of the box, Median of the box)
+            Dictionary<double, double> Rmedians = GetMedians(RSide);
+            Dictionary<double, double> Gmedians = GetMedians(GSide);
+            Dictionary<double, double> Bmedians = GetMedians(BSide);
+
+            // Iterate over the full picture applying color medians with respect to the box any color is in
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    int R = 0, G = 0, B = 0;
+                    foreach(var keyValuePair in Rmedians)
+                    {
+                        if(ColorPic[x,y].R<=keyValuePair.Key)
+                        {
+                            R = Convert.ToInt32(keyValuePair.Value);
                             break;
                         }
                     }
+                    foreach (var keyValuePair in Gmedians)
+                    {
+                        if (ColorPic[x, y].G <= keyValuePair.Key)
+                        {
+                            G = Convert.ToInt32(keyValuePair.Value);
+                            break;
+                        }
+                    }
+                    foreach (var keyValuePair in Bmedians)
+                    {
+                        if (ColorPic[x, y].B <= keyValuePair.Key)
+                        {
+                            B = Convert.ToInt32(keyValuePair.Value);
+                            break;
+                        }
+                    }
+                    pic.SetPixel(x, y, Color.FromArgb(ColorPic[x, y].A, R, G, B));
                 }
             }
+            
             output_Image.Source = ToBitmapImage(pic);
 
         }
@@ -619,12 +805,12 @@ namespace ImageFilterApp
 
         private void MedCut_Click(object sender, RoutedEventArgs e)
         {
-            MedianCut_Copout();
+            MedianCut();
         }
 
         private void Lab2_Click(object sender, RoutedEventArgs e)
         {
-            Lab2();
+            //Lab2();
         }
 
 
