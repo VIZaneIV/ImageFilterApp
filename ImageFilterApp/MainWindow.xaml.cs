@@ -408,7 +408,7 @@ namespace ImageFilterApp
             Bitmap output = new Bitmap(pic.Width, pic.Height);
             int kernelSize = 3;
             int matrixLimits = Convert.ToInt32((kernelSize - 1) / 2);
-            int[,] kernelWeighs = new int[3, 3] { { 0, -1,  0 },
+            int[,] kernelWeighs = new int[3, 3] { { -1,  0,  0 },
                                                   { 0,  1,  0 },
                                                   { 0,  0,  0 } };
 
@@ -727,6 +727,53 @@ namespace ImageFilterApp
 
         }
 
+        private void Lab1()
+        {
+            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+            Bitmap output = new Bitmap(pic.Width, pic.Height);
+            int kernelSize = 5;
+            int matrixLimits = Convert.ToInt32((kernelSize - 1) / 2);
+            int M = 200;
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    int avgR = 0, avgG = 0, avgB = 0;
+                    int blurPixelCount = 0;
+                    Color centrePixel = pic.GetPixel(x, y);
+
+                    for (int ky = -matrixLimits; ky <= matrixLimits; ky++)
+                    {
+                        for (int kx = -matrixLimits; kx <= matrixLimits; kx++)
+                        {
+                            if (y + ky >= 0 && y + ky < pic.Height && x + kx >= 0 && x + kx < pic.Width)
+                            {
+                                Color pixel = pic.GetPixel(x + kx, y + ky);
+
+                                if(Math.Abs(centrePixel.R-pixel.R) + Math.Abs(centrePixel.G-pixel.G)+Math.Abs(centrePixel.B-pixel.B) < M)
+                                {
+                                    avgR += pixel.R;
+                                    avgG += pixel.G;
+                                    avgB += pixel.B;
+
+                                    blurPixelCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    avgR = avgR / blurPixelCount;
+                    avgG = avgG / blurPixelCount;
+                    avgB = avgB / blurPixelCount;
+
+                    output.SetPixel(x, y, Color.FromArgb(pic.GetPixel(x, y).A, avgR, avgG, avgB));
+                }
+            }
+
+            output_Image.Source = ToBitmapImage(output);
+        }
+
 
         // ===============================================================================
 
@@ -808,9 +855,9 @@ namespace ImageFilterApp
             MedianCut();
         }
 
-        private void Lab2_Click(object sender, RoutedEventArgs e)
+        private void Lab1_Click(object sender, RoutedEventArgs e)
         {
-            //Lab2();
+            Lab1();
         }
 
 
