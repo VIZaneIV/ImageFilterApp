@@ -524,59 +524,85 @@ namespace ImageFilterApp
         }
 
         // Fixed average dithering
-        private void Average_Dithering()
+        //private void Average_Dithering()
+        //{
+        //    Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+        //    int average = 0;
+
+        //    int number = Convert.ToInt32(slValue_Dither.Value);
+
+        //    int[] intervals = new int[number];
+        //    int step = (255 / number);
+
+        //    for (int i = 0; i < number - 1; i++)
+        //        intervals[i] = step * (i + 1);
+
+        //    intervals[number - 1]=255;
+
+        //    for (int y = 0; (y <= (pic.Height - 1)); y++)
+        //    {
+        //        for (int x = 0; (x <= (pic.Width - 1)); x++)
+        //        {
+        //            Color pixelColor = pic.GetPixel(x, y);
+        //            average += Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3);
+        //        }
+        //    }
+
+        //    average = Convert.ToInt32(average / (pic.Height * pic.Width));
+
+        //    for (int y = 0; (y <= (pic.Height - 1)); y++)
+        //    {
+        //        for (int x = 0; (x <= (pic.Width - 1)); x++)
+        //        {
+        //            Color pixelColor = pic.GetPixel(x, y);
+
+        //            for (int i = 0; i < number; i++)
+        //            {
+        //                if (Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3) < intervals[i])
+        //                {
+        //                    pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, intervals[i], intervals[i], intervals[i]));
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    output_Image.Source = ToBitmapImage(pic);
+        //}
+
+        private void RandomDithering()
         {
-            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
-            int average = 0;
+            GreyScaleConvertion();
+            Bitmap pic = BitmapImage2Bitmap(output_Image.Source as BitmapImage);
+            Color[,] ColorPic = TranslatePicture(pic);
 
-            int number = Convert.ToInt32(slValue_Dither.Value);
+            int k = Convert.ToInt32(slValue_Random.Value) - 1;
+            Random rnd = new Random();
 
-            int[] intervals = new int[number];
-            int step = (255 / number);
-
-            for (int i = 0; i < number - 1; i++)
-                intervals[i] = step * (i + 1);
-
-            intervals[number - 1]=255;
-
-            for (int y = 0; (y <= (pic.Height - 1)); y++)
-            {
-                for (int x = 0; (x <= (pic.Width - 1)); x++)
-                {
-                    Color pixelColor = pic.GetPixel(x, y);
-                    average += Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3);
-                }
-            }
-
-            average = Convert.ToInt32(average / (pic.Height * pic.Width));
+            List<double> levels = new List<double>();
+            double step = 256 / k;
+            for (int i = 1; i <= k; i++)
+                levels.Add(step * i);
 
             for (int y = 0; (y <= (pic.Height - 1)); y++)
             {
                 for (int x = 0; (x <= (pic.Width - 1)); x++)
                 {
-                    Color pixelColor = pic.GetPixel(x, y);
-
-                    for (int i = 0; i < number; i++)
+                    for(int i = 0; i < levels.Count; i++)
                     {
-                        if (Convert.ToInt32((pixelColor.R + pixelColor.G + pixelColor.B) / 3) < intervals[i])
+                        if(ColorPic[x, y].R < levels[i])
                         {
-                            pic.SetPixel(x, y, Color.FromArgb(pixelColor.A, intervals[i], intervals[i], intervals[i]));
+                            int threshold = rnd.Next(Convert.ToInt32(levels[i] - step), Convert.ToInt32(levels[i]));
+                            pic.SetPixel(x, y, Color.FromArgb(ColorPic[x, y].A,
+                                Clamp(Convert.ToInt32((ColorPic[x, y].R > threshold ? levels[i] : levels[i] - step)),0,255),
+                                Clamp(Convert.ToInt32((ColorPic[x, y].G > threshold ? levels[i] : levels[i] - step)), 0, 255),
+                                Clamp(Convert.ToInt32((ColorPic[x, y].B > threshold ? levels[i] : levels[i] - step)), 0, 255)));
                             break;
                         }
                     }
                 }
             }
-
             output_Image.Source = ToBitmapImage(pic);
-        }
-
-        private void RandomDithering()
-        {
-            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
-            Color[,] ColorPic = TranslatePicture(pic);
-
-            int k = Convert.ToInt32(slValue_Random.Value);
-
         }
         
         private void MedianCut()
@@ -987,7 +1013,7 @@ namespace ImageFilterApp
 
         private void Dithering_Click(object sender, RoutedEventArgs e)
         {
-            Average_Dithering();
+            //Average_Dithering();
         }
 
         private void MedCut_Click(object sender, RoutedEventArgs e)
@@ -1012,7 +1038,7 @@ namespace ImageFilterApp
 
         private void Random_dithering_button_Click(object sender, RoutedEventArgs e)
         {
-
+            RandomDithering();
         }
 
 

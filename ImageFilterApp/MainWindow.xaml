@@ -53,7 +53,7 @@
         <TextBox Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}"  TextAlignment="Left" Margin="618,380,134,10" />
         <Button x:Name="Median_Cut" Content="Median cut" HorizontalAlignment="Left" Margin="483,355,0,0" VerticalAlignment="Top" Width="130" Click="MedCut_Click"/>
         <Slider x:Name="slValue_Random" Maximum="255" TickPlacement="BottomRight" TickFrequency="1" IsSnapToTickEnabled="True" Margin="483,327,179,63" />
-        <TextBox Text="{Binding Value, ElementName=slValue_Dither, UpdateSourceTrigger=PropertyChanged}"  TextAlignment="Left" Margin="618,327,134,63" />
+        <TextBox Text="{Binding Value, ElementName=slValue_Random, UpdateSourceTrigger=PropertyChanged}"  TextAlignment="Left" Margin="618,327,134,63" />
         <Button x:Name="Complex_Blur_button" Content="Complex Blur" HorizontalAlignment="Left" Margin="136,364,0,0" VerticalAlignment="Top" Width="130" Click="Lab1_Click"/>
         <Button x:Name="Hist_Stretch1" Content="Hist Stretch" HorizontalAlignment="Left" Margin="669,355,0,0" VerticalAlignment="Top" Width="88" Click="Hist_Stretch_Click" />
         <Button x:Name="Hist_Eq1" Content="Hist Eq" HorizontalAlignment="Left" Margin="669,379,0,0" VerticalAlignment="Top" Width="88" Click="Hist_Eq_Click" />
