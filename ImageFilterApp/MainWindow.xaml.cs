@@ -570,6 +570,14 @@ namespace ImageFilterApp
             output_Image.Source = ToBitmapImage(pic);
         }
 
+        private void RandomDithering()
+        {
+            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+            Color[,] ColorPic = TranslatePicture(pic);
+
+            int k = Convert.ToInt32(slValue_Random.Value);
+
+        }
         
         private void MedianCut()
         {
@@ -599,12 +607,6 @@ namespace ImageFilterApp
             RSide.Add(256, Rtmp);
             GSide.Add(256, Gtmp);
             BSide.Add(256, Btmp);
-
-            //Rtmp.Clear();
-            //Gtmp.Clear();
-            //Btmp.Clear();
-
-
 
             for (int i = 0; i < numberOfCuts; i++)
             { 
@@ -774,6 +776,144 @@ namespace ImageFilterApp
             output_Image.Source = ToBitmapImage(output);
         }
 
+        private void Hist_Stretch()
+        {
+            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+            Color[,] ColorPic = TranslatePicture(pic);
+
+            int[] Rchannel = new int[256];
+            int[] Gchannel = new int[256];
+            int[] Bchannel = new int[256];
+
+            for (int i = 0; i < 256; i++)
+            {
+                Rchannel[i] = 0;
+                Gchannel[i] = 0;
+                Bchannel[i] = 0;
+            }
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    Rchannel[ColorPic[x, y].R] += 1;
+                    Gchannel[ColorPic[x, y].G] += 1;
+                    Bchannel[ColorPic[x, y].B] += 1;
+                }
+            }
+
+            int Rmax = 0, Rmin = 0, Gmax = 0, Gmin = 0, Bmax = 0, Bmin = 0;
+
+            for (int i = 0; i < 256; i++)
+            {
+                if (Rchannel[i] != 0 && Rmin == 0)
+                    Rmin = i;
+                if (Gchannel[i] != 0 && Gmin == 0)
+                    Gmin = i;
+                if (Bchannel[i] != 0 && Bmin == 0)
+                    Bmin = i;
+                if (Rmin != 0 && Gmin != 0 && Bmin != 0)
+                    break;
+            }
+            for (int i = 255; i >= 0; i--)
+            {
+                if (Rchannel[i] != 0 && Rmax == 0)
+                    Rmax = i;
+                if (Gchannel[i] != 0 && Gmax == 0)
+                    Gmax = i;
+                if (Bchannel[i] != 0 && Bmax == 0)
+                    Bmax = i;
+                if (Rmax != 0 && Gmax != 0 && Bmax != 0)
+                    break;
+            }
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    
+                    pic.SetPixel(x, y, Color.FromArgb(ColorPic[x,y].A,
+                        Clamp(Convert.ToInt32((255 / (Rmax - Rmin)) * (ColorPic[x, y].R - Rmin)),0,255),
+                        Clamp(Convert.ToInt32((255 / (Gmax - Gmin)) * (ColorPic[x, y].G - Gmin)),0,255),
+                        Clamp(Convert.ToInt32((255 / (Bmax - Bmin)) * (ColorPic[x, y].B - Rmin)),0,255)));
+                }
+            }
+            output_Image.Source = ToBitmapImage(pic);
+        }
+
+        private void Hist_Eq()
+        {
+            Bitmap pic = BitmapImage2Bitmap(input_Image.Source as BitmapImage);
+            Color[,] ColorPic = TranslatePicture(pic);
+
+            int[] Rchannel = new int[256];
+            int[] Gchannel = new int[256];
+            int[] Bchannel = new int[256];
+
+            for (int i = 0; i < 256; i++)
+            {
+                Rchannel[i] = 0;
+                Gchannel[i] = 0;
+                Bchannel[i] = 0;
+            }
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+                    Rchannel[ColorPic[x, y].R] += 1;
+                    Gchannel[ColorPic[x, y].G] += 1;
+                    Bchannel[ColorPic[x, y].B] += 1;
+                }
+            }
+
+            double[] DR = new double[256];
+            double[] DG = new double[256];
+            double[] DB = new double[256];
+
+            int Npixels = pic.Width * pic.Height;
+            for (int i = 0; i < 256; i++)
+            {
+                double hR = 0, hG = 0, hB = 0;
+                for (int j = 0; j <= i; j++)
+                {
+                    hR += Rchannel[j];
+                    hG += Gchannel[j];
+                    hB += Bchannel[j];
+                }
+                DR[i] = hR / Npixels;
+                DG[i] = hG / Npixels;
+                DB[i] = hB / Npixels;
+            }
+
+            double  DRmin = 0, DGmin = 0, DBmin = 0;
+
+            for (int i = 0; i < 256; i++)
+            {
+                if (DR[i] != 0 && DRmin == 0)
+                    DRmin = DR[i];
+                if (DG[i] != 0 && DGmin == 0)
+                    DGmin = DG[i];
+                if (DB[i] != 0 && DBmin == 0)
+                    DBmin = DB[i];
+                if (DRmin != 0 && DGmin != 0 && DBmin != 0)
+                    break;
+            }
+
+            for (int y = 0; (y <= (pic.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (pic.Width - 1)); x++)
+                {
+
+                    pic.SetPixel(x, y, Color.FromArgb(ColorPic[x, y].A,
+                        Clamp(Convert.ToInt32(((DR[ColorPic[x, y].R] - DRmin) / 1 - DRmin) * (256 - 1)), 0, 255),
+                        Clamp(Convert.ToInt32(((DG[ColorPic[x, y].R] - DGmin) / 1 - DGmin) * (256 - 1)), 0, 255),
+                        Clamp(Convert.ToInt32(((DB[ColorPic[x, y].R] - DBmin) / 1 - DBmin) * (256 - 1)), 0, 255)));
+                }
+            }
+            output_Image.Source = ToBitmapImage(pic);
+        }
+
 
         // ===============================================================================
 
@@ -858,6 +998,21 @@ namespace ImageFilterApp
         private void Lab1_Click(object sender, RoutedEventArgs e)
         {
             Lab1();
+        }
+
+        private void Hist_Stretch_Click(object sender, RoutedEventArgs e)
+        {
+            Hist_Stretch();
+        }
+
+        private void Hist_Eq_Click(object sender, RoutedEventArgs e)
+        {
+            Hist_Eq();
+        }
+
+        private void Random_dithering_button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
 
